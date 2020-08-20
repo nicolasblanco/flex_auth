@@ -5,8 +5,9 @@ defmodule FlexAuth.Plug.StoredSessionPlug do
 
       defp get_resource_function(), do: unquote(Keyword.fetch!(opts, :get_resource_function))
       defp session_module(), do: unquote(Keyword.fetch!(opts, :session_module))
-      defp endpoint(), do: unquote(Keyword.fetch!(opts, :endpoint))
+      defp endpoint_module(), do: unquote(Keyword.fetch!(opts, :endpoint_module))
       defp resource_name(), do: unquote(Keyword.fetch!(opts, :resource_name))
+      defp token_timeout(), do: unquote(Keyword.get(opts, :token_timeout, 806_400))
 
       defp fetch_auth_resource(conn) do
         resource =
@@ -21,10 +22,10 @@ defmodule FlexAuth.Plug.StoredSessionPlug do
       end
 
       defp validate_session(conn) do
-        case get_session(conn, :"session_uuid_#{resource_name()}") do
+        case get_session(conn, :"session_#{resource_name()}_uuid") do
           nil ->
             conn
-            |> put_session(:"session_uuid_#{resource_name()}", Ecto.UUID.generate())
+            |> put_session(:"session_#{resource_name()}_uuid", Ecto.UUID.generate())
 
           session_uuid ->
             conn
@@ -36,10 +37,10 @@ defmodule FlexAuth.Plug.StoredSessionPlug do
         case apply(session_module(), :get, [session_uuid]) do
           {:ok, token} ->
             case Phoenix.Token.verify(
-                   endpoint(),
+                   endpoint_module(),
                    apply(session_module(), :signing_salt, []),
                    token,
-                   max_age: 806_400
+                   max_age: token_timeout()
                  ) do
               {:ok, resource_id} ->
                 put_private(conn, :"auth_#{resource_name()}_id", resource_id)
