@@ -3,10 +3,10 @@ defmodule FlexAuth.Plug.StoredSessionPlug do
     quote do
       import Plug.Conn
 
-      def get_resource_function(), do: unquote(Keyword.fetch!(opts, :get_resource_function))
-      def session_module(), do: unquote(Keyword.fetch!(opts, :session_module))
-      def endpoint(), do: unquote(Keyword.fetch!(opts, :endpoint))
-      def resource_name(), do: unquote(Keyword.fetch!(opts, :resource_name))
+      defp get_resource_function(), do: unquote(Keyword.fetch!(opts, :get_resource_function))
+      defp session_module(), do: unquote(Keyword.fetch!(opts, :session_module))
+      defp endpoint(), do: unquote(Keyword.fetch!(opts, :endpoint))
+      defp resource_name(), do: unquote(Keyword.fetch!(opts, :resource_name))
 
       defp fetch_auth_resource(conn) do
         resource =
