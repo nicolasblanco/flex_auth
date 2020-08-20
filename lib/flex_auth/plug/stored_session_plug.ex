@@ -13,7 +13,7 @@ defmodule FlexAuth.Plug.StoredSessionPlug do
         apply(
           elem(mfa, 0),
           elem(mfa, 1),
-          [conn, private_resource_id] ++ elem(2)
+          [conn, private_resource_id] ++ elem(mfa, 2)
         )
       end
 
